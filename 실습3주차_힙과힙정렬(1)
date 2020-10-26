@@ -1,0 +1,252 @@
+1. 처음시도.
+
+
+#include<stdio.h>
+#pragma warning(disable: 4996)
+#define MAX 100
+int H[MAX];
+int n = 0;
+
+
+
+void insertItem(int key);
+int removeMax();
+void printHeap();
+inline int left(int x);
+inline int right(int x);
+inline int parent(int x);
+
+int main() {
+	char input;
+	int data;
+	while (1) {
+		scanf("%c", &input);
+		if (input == 'i') {
+			scanf("%d", &data);
+			insertItem(data);
+			printf("0\n");
+		}
+		if (input == 'd') {
+			printf("%d\n", removeMax());
+		}
+		if (input == 'p') {
+			printHeap();
+		}
+		if (input == 'q') {
+			break;
+		}
+	}
+}
+
+
+void insertItem(int key) {
+	int idx = n+1;
+	H[idx] = key;
+	while (idx > 1) {
+		if (H[parent(idx)] > key) {
+			break;
+		}
+		else {
+			H[idx] = H[parent(idx)];
+			idx = parent(idx);
+		}
+	}
+	H[idx] = key;
+	n++;
+}
+
+void printHeap() {
+	int idx = 1;
+	while (idx <= n + 1) {
+		int f=idx;
+		int flag = 2 * idx;
+		while (f < flag && f<=n) {
+			if (f % 2 == 0) {
+				printf(" %d", H[f]);
+			}
+			else {
+				printf(" %d", H[f]);
+			}
+			f++;
+		}
+		idx = idx * 2;
+	}
+	printf("\n");
+}
+
+int removeMax() {
+	int res = H[1];
+	H[1] = H[n];
+	n--;
+
+	int idx = 1;
+	while (1) {
+		int l = left(idx);
+		int r = right(idx);
+
+		int max;
+		if (l == 0 && r == 0) {
+			break;
+		}
+		else if (r == 0 || l > r) {
+			max = l;
+		}
+		else {
+			max = r;
+		}
+
+		int tmp;
+		if (H[idx] < H[max]) {
+			tmp = H[idx];
+			H[idx] = H[max];
+			H[max] = tmp;
+			idx = max;
+		}
+		else {
+			break;
+		}
+	}
+	return res;
+}
+
+
+
+
+
+
+inline int left(int x) {
+	int res = x * 2;
+	if (res > n) return 0;
+	return res;
+}
+
+inline int right(int x) {
+	int res = x * 2 + 1;
+	if (res > n) return 0;
+	return res;
+}
+
+inline int parent(int x) {
+	return x / 2;
+}
+
+2. 2차시도 1번
+
+#include<stdio.h>
+#pragma warning(disable: 4996)
+#define MAX 100
+int H[MAX];
+int n = 0;
+
+void upHeap(int idx);
+int* insertItem(int key, int H[]);
+void downHeap(int idx);
+int removeMax(int H[]);
+void printHeap();
+int left(int x);
+int right(int x);
+int parent(int x);
+
+
+int main() {
+	char opt;
+	int N;
+	while (1) {
+		scanf("%c", &opt);
+		if (opt == 'i') {
+			scanf("%d", &N);
+			insertItem(N, H);
+			printf("0\n");
+		}
+		if (opt == 'd') {
+			printf("%d\n", removeMax(H));
+		}
+		if (opt == 'p') {
+			printHeap();
+		}
+		if (opt == 'q') {
+			break;
+		}
+	}
+
+
+}
+
+
+
+void upHeap(int idx) {
+	int tmp, big;
+	if ((parent(idx) >= 1) && (H[idx] > H[parent(idx)])) big = idx;
+	else big = parent(idx);
+	if (big != parent(idx)) {
+		tmp = H[parent(idx)];
+		H[parent(idx)] = H[idx];
+		H[idx] = tmp;
+		upHeap(parent(idx));
+	}
+}
+
+void downHeap(int idx) {
+	int l;
+	int key = H[idx];
+	while (idx <= n / 2) {
+		l = idx << 1;
+		if (l < n && H[l] < H[l + 1]) l++;
+		if (key >= H[l]) break;
+		H[idx] = H[l];
+		idx = l;
+	}
+	H[idx] = key;
+}
+
+
+
+int* insertItem(int key, int H[]) {
+	n = n + 1;
+	H[n] = key;
+	upHeap(n);
+	return H;
+}
+
+int removeMax(int H[]) {
+	int key = H[1];
+	H[1] = H[n];
+	n = n - 1;
+	downHeap(1);
+	return key;
+}
+
+void printHeap() {
+	int idx = 1;
+	while (idx <= n + 1) {
+		int f = idx;
+		int flag = 2 * idx;
+		while (f < flag && f <= n) {
+			if (f % 2 == 0) {
+				printf(" %d", H[f]);
+			}
+			else {
+				printf(" %d", H[f]);
+			}
+			f++;
+		}
+		idx = idx * 2;
+	}
+	printf("\n");
+}
+
+int left(int x) {
+	int res = x * 2;
+	if (res > n) return 0;
+	return res;
+}
+
+int right(int x) {
+	int res = x * 2 + 1;
+	if (res > n) return 0;
+	return res;
+}
+
+int parent(int x) {
+	return x / 2;
+}
