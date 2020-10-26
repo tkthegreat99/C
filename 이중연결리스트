@@ -1,0 +1,123 @@
+typedef struct NODE {
+   char ch;
+   struct NODE* prev;
+   struct NODE* next;
+
+}NODE;
+
+NODE* getnode() {   //새로운 노드 생성
+   NODE* ptr;
+   ptr = (NODE*)malloc(sizeof(NODE));   //동적할당
+   ptr->next = NULL;
+   ptr->prev = NULL;
+   return ptr;      //새로운 노드의 주소 반환
+}
+
+void initialize(NODE** H, NODE** T, int* n) {   //초기화
+   *H = getnode();   //헤더노드
+   *T = getnode();   //테일러노드
+   (*H)->next = (*T);
+   (*T)->prev = (*H);
+   *n = 0;   //노드의 개수 (헤더노드 테일러노드 제외)
+   return;
+}
+
+void add(NODE* H, int r, char ch, int* n) {   //r번째에 노드 삽입
+   NODE* newnode;
+   NODE* p = H;
+   if ((r < 1) || (r > * n + 1)) {   //r이 *n+1인경우 테일러노드 앞에 추가, n+1보다 크면 테일러노드 다음에 추가해야하므로 오류
+      printf("invalid position\n");
+      return;
+   }
+   newnode = getnode();
+   newnode->ch = ch;
+   for (int i = 0; i < r; i++) {   //r번째 노드로 이동
+      p = p->next;
+   }
+   newnode->prev = p->prev;   //r번재 노드 앞에 새로운 노드 연결
+   newnode->next = p;
+   (p->prev)->next = newnode;
+   p->prev = newnode;
+   *n += 1;   //노드 개수 증가
+   return;
+}
+
+void delete(NODE* H, int r, int* n) {   //r번째 노드 삭제
+   NODE* p = H;
+   if ((r < 1) || (r > * n)) {   //r이 n보다 크면 테일러노드거나 노드가없으므로 오류
+      printf("invalid position\n");
+      return;
+   }
+   for (int i = 0; i < r; i++) {   //r번째 노드로 이동
+      p = p->next;
+   }
+   (p->prev)->next = p->next;   //r번째 양옆을 서로 연결하고
+   (p->next)->prev = p->prev;
+   free(p);               //r번째 노드는 메모리해제
+   *n -= 1;               //노드 개수 감소
+   return;
+}
+
+void get(NODE* H, int r, int* n) {   //r번째 노드 출력
+   NODE* p = H;
+   if ((r < 1) || (r > * n)) {  //r이 n보다 크면 테일러노드거나 노드가없으므로 오류
+      printf("invalid position\n");
+      return;
+   }
+   for (int i = 0; i < r; i++) {   //r번째 노드로 이동
+      p = p->next;
+   }
+   printf("%c\n", p->ch);   //r번째 노드의 원소 출력
+   return;
+}
+
+void print(NODE* H, NODE *T) {   //모든 리스트의 원소 출력
+   NODE* p;
+   for (p = H->next; p != T; p = p->next) {   //p는 H->next 부터 p != T 까지
+      printf("%c", p->ch);
+   }
+   printf("\n");
+   return;
+}
+
+int main() {
+   int N, num, r;
+   int* n = &num;
+   char type, ch;
+   NODE* H, * T, *p, *q;
+   
+   initialize(&H, &T, n);
+
+   scanf("%d", &N);
+   getchar();
+
+   for (int i = 0; i < N; i++) {
+      scanf("%c", &type);
+      if (type == 'A') {      //add
+         scanf("%d %c", &r, &ch);
+         add(H, r, ch, n);
+      }
+      else if (type == 'D') {   //delete
+         scanf("%d", &r);
+         delete(H, r, n);
+      }
+      else if (type == 'G') {   //get
+         scanf("%d", &r);
+         get(H, r, n);
+      }
+      else if (type == 'P') {   //print
+         print(H, T);
+      }
+      getchar();
+   }
+
+   //메모리해제
+   for (p = H; p != T;) {   //H부터 테일노드까지 메모리 해제
+      q = p->next;
+      free(p);
+      p = q;
+   }
+   free(T); //T메모리 해제
+
+   return 0;
+}
