@@ -1,0 +1,190 @@
+1.
+
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+typedef struct NODE {
+
+	struct NODE* next;
+	int data;
+
+}NODE;
+
+typedef struct {
+	NODE* L1;
+	NODE* L2;
+}divide;
+
+
+NODE* getnode(int n);
+void mergeSort(NODE** L, int k);
+divide partition(NODE* L, int k);
+NODE* merge(NODE* L1, NODE* L2);
+void print(NODE* n);
+
+int main() {
+	NODE* H;
+	NODE* p;
+	int n;
+	int num;
+	scanf("%d", &n);
+
+	H = (NODE*)malloc(sizeof(NODE));
+	
+	p = H;
+
+	for (int i = 0; i < n; i++) {
+		scanf("%d", &num);
+		p->next = getnode(num);
+		p = p->next;
+	}
+	mergeSort(&H->next, n);
+	
+	print(H->next);
+	
+	
+}
+
+divide partition(NODE* L, int k) {
+	NODE* p;
+	NODE* L1 , *L2;
+
+	p = L;
+	L1 = L;
+	divide res;
+
+	for (int i = 0; i < k - 1; i++) {
+		p = p->next;
+	}
+	 
+	L2 = p->next;
+	p->next = NULL;
+	
+	res.L1 = L1;
+	res.L2 = L2;
+	return res;
+	
+}
+
+NODE* getnode(int n) {
+	NODE* new = (NODE*)malloc(sizeof(NODE));
+	new->data = n;
+	new->next = NULL;
+	return new;
+}
+
+void mergeSort(NODE** L, int k) {
+	NODE* L1 = NULL;
+	NODE* L2 = NULL;
+	divide tmp;
+	NODE* p;
+
+	if (k > 1 && *L != NULL) {
+		tmp = partition(*L, k / 2);
+		L1 = tmp.L1;
+		L2 = tmp.L2;	
+
+		mergeSort(&L1, k / 2);
+		mergeSort(&L2, (k / 2)+1);
+		*L = merge(L1, L2);
+	}
+
+
+}
+NODE* merge(NODE* L1, NODE* L2) {
+	NODE* res = NULL;
+	if (L1 == NULL) return L2;
+	else if (L2 == NULL) return L1;
+
+
+	if (L1->data < L2->data) {
+		res = L1;
+		res->next = merge(L1->next, L2);
+	}
+	else {
+		res = L2;
+		res->next = merge(L1, L2->next);
+	}
+	return res;
+}
+
+void print(NODE* n) {
+	NODE* p = n;
+	while (p != NULL) {
+		printf(" %d", p->data);
+		p = p->next;
+	}
+}
+
+
+
+2.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+#include<time.h>
+
+void inPlaceQuickSort(int* L, int l, int r);
+int findPivot(int* L, int l, int r);
+void swap(int* L, int i, int j);
+int inPlacePartition(int* L, int start, int end);
+
+int main() {
+   int n;
+   int num;
+   srand(time(NULL));
+   scanf("%d", &n);
+   int* L = (int*)malloc(sizeof(int) * n);
+   for (int i = 0; i < n; i++) {
+      scanf("%d", &num);
+      *(L + i) = num;
+   }
+   inPlaceQuickSort(L, 0, n - 1);
+   for (int i = 0; i < n; i++) {
+      printf(" %d", *(L + i));
+   }
+
+}
+
+
+int findPivot(int* L, int l, int r) {
+   int res;
+   res = rand() % r + l;
+   swap(L, res, r);
+   return inPlacePartition(L, l, r);
+}
+
+int inPlacePartition(int* L, int start, int end) {
+   int pivot = L[end];
+   int i = start;
+   for (int j = start; j < end; j++) {
+      if (L[j] <= pivot) {
+         swap(L, i, j);
+         i += 1;
+      }
+   }
+   swap(L, i, end);
+   return i;
+}
+   
+
+void inPlaceQuickSort(int* L, int start, int end) {
+   if (start < end) {
+      int k = inPlacePartition(L, start, end);
+      inPlaceQuickSort(L, start, k-1);
+      inPlaceQuickSort(L, k + 1, end);
+   }
+}
+
+void swap(int* L, int i, int j) {
+   int tmp = L[i];
+   L[i] = L[j];
+   L[j] = tmp;
+}
+
+/*
+8
+73 65 48 31 29 20 8 3
+
+*/
