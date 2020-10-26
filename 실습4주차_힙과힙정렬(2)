@@ -1,0 +1,111 @@
+#include<stdio.h>
+#pragma warning(disable: 4996)
+#define MAX 100
+int L[MAX];
+int n=0;
+
+
+
+
+void insertItem(int key);
+int* inPlaceHeapSort(int L[], int n);
+int* buildHeap(int L[], int n);
+void downHeap(int L[], int idx, int size);
+void swap(int L[], int i, int j);
+int parent(int x);
+int right(int x);
+int left(int x);
+void printArray(int L[]);
+
+int main() {
+	int N;
+	int key;
+	scanf("%d", &N);
+	
+	for (int i = 1; i <= N; i++) {
+		scanf("%d", &L[i]);
+		
+	}
+	inPlaceHeapSort(L, N);
+	printArray(L);
+
+}
+
+
+int* inPlaceHeapSort(int L[], int n) {
+	buildHeap(L, n);
+	for (int i = n; i > 1; i--) {
+		swap(L, 1, i);
+		downHeap(L, 1, i - 1);
+	}
+	return L;
+}
+
+void downHeap(int L[], int idx, int size) {
+	int l = left(idx);
+	int r = right(idx);
+	if (l > size) return;
+	int greater = l;
+	if (r <= size) {
+		if (L[r] > L[greater]) {
+			greater = r;
+		}
+	}
+	if (L[idx] >= L[greater]) {
+		return;
+	}
+	swap(L, idx, greater);
+	downHeap(L, greater, size);
+}
+
+int* buildHeap(int L[], int n) {
+	for (int i = 1; i <= n; i++) {
+		insertItem(L[i]);
+	}
+	return L;
+}
+
+void insertItem(int key) {
+	int idx = n + 1;
+	L[idx] = key;
+	while (idx > 1) {
+		if (L[parent(idx)] > key) {
+			break;
+		}
+		else {
+			L[idx] = L[parent(idx)];
+			idx = parent(idx);
+		}
+	}
+	L[idx] = key;
+	n++;
+}
+
+
+
+void swap(int L[], int i, int j) {
+	int tmp = L[i];
+	L[i] = L[j];
+	L[j] = tmp;
+}
+
+int parent(int x) {
+	int res = x / 2;
+	return res;
+}
+
+int right(int x) {
+	int res = x * 2 + 1;
+	return res;
+}
+
+int left(int x) {
+	int res = x * 2;
+	return res;
+}
+
+void printArray(int L[]) {
+	for (int i = 1; i <= n; i++) {
+		printf(" %d", L[i]);
+	}
+}
