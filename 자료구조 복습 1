@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdio.h>
+typedef struct node {
+   char elem;
+   struct node* next;
+   struct node* prev;
+}NODE;
+void print(NODE *head, NODE *tail) {
+   NODE* p = head->next;
+   while (p != tail) {
+      printf("%c", p->elem);//
+      p = p->next;//
+   }
+   printf("\n");
+}
+void add(NODE* head, NODE *tail, int r, char e) {
+   NODE* newnode = (NODE*)malloc(sizeof(NODE));//
+   newnode->elem = e;//
+   NODE* p = head;
+   int a = 0;//
+   while (p != tail) {//
+      a++;
+      if (a == r) {
+         break;
+      }
+      p = p->next;//
+   }
+   if (p == tail) {//
+      printf("invalid position\n");
+      return;
+   }
+   else {
+      newnode->prev = p;
+      newnode->next = p->next;
+      p->next->prev = newnode;//
+      p->next = newnode;//
+   }
+}
+void delete(NODE * head,NODE *tail, int r) {
+   NODE* p = head;
+   int a = 0;//
+   while (p->next != tail) {//
+      a++;
+      if (a == r) {
+         break;
+      }
+      p = p->next;
+   }
+   if (p->next == tail) {//
+      printf("invalid position\n");
+      return;
+   }
+   else {
+      p->next = p->next->next;
+      p->next->prev = p;
+   }
+
+}
+NODE* get(NODE* head,NODE *tail, int r) {
+   NODE* p = head->next;
+   int a = 0;//
+   while (p!= tail) {//
+      a++;
+      if (a == r) {
+         break;
+      }
+      p = p->next;
+   }
+   if (p ==tail) {
+      printf("invalid position\n");
+      return;
+   }
+   printf("%c\n", p->elem);
+   return p->elem;
+}
+int main() {
+   NODE *head, *tail;
+   head = (NODE*)malloc(sizeof(NODE));
+   tail= (NODE*)malloc(sizeof(NODE));
+   head->elem = '\0';
+   tail->elem = '\0';
+   head->next = tail;
+   tail->prev = head;
+   int N, r;
+   char L, e;
+   scanf("%d", &N);
+   getchar();
+   for (int i = 0;i < N;i++) {
+      scanf("%c", &L);
+      getchar();
+      switch (L) {
+      case 'A':
+         scanf("%d %c", &r, &e);
+         getchar();
+         add(head,tail, r, e);
+         break;
+
+      case 'D':
+         scanf("%d", &r);
+         getchar();
+         delete(head,tail, r);
+         break;
+      case 'G':
+         scanf("%d", &r);
+         getchar();
+         get(head,tail, r);
+         break;
+      case 'P':
+         print(head, tail);
+         break;
+
+      }
+   }
+}
