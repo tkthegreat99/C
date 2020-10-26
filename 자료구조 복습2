@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct binarytree {
+   int data;
+   struct binarytree* left;
+   struct binarytree* right;
+}TREE;
+typedef int (*visitwhy)(void);
+void getleft(TREE *root, int data) {
+   TREE* newtree = (TREE*)malloc(sizeof(TREE));
+   newtree->left = NULL;
+   newtree->right = NULL;
+   newtree->data = data;
+   root->left =newtree;
+}
+void getright(TREE* root, int data) {
+   TREE* newtree = (TREE*)malloc(sizeof(TREE));
+   newtree->left = NULL;
+   newtree->right = NULL;
+   newtree->data = data;
+   root->right = newtree;
+}
+
+void visit(TREE* root, int data, int data2, int data3) {
+   if (root == NULL) {
+      return;
+   }
+   if (root->data == data) {
+      if (data2)
+         getleft(root, data2);
+      if (data3)
+         getright(root, data3);
+      return;
+   }
+   visit(root->right, data, data2, data3);
+   visit(root->left, data, data2, data3);
+
+}
+void print(TREE* root) {
+   if (root == NULL) {
+      return;
+   }
+   printf(" %d\n", root->data);
+   print(root->left);
+   print(root->right);
+}
+int main() {
+   TREE root, *p;
+   int N, N2, tree1, tree2, tree3;
+   char ar[101]={'\0'};
+   scanf("%d", &N);
+   scanf("%d %d %d", &tree1, &tree2, &tree3);
+   root.data = tree1;
+   getleft(&root, tree2);
+   getright(&root, tree3);
+   for (int i = 0;i < N-1;i++) {
+      scanf("%d %d %d", &tree1, &tree2, &tree3);
+      visit(&root, tree1, tree2, tree3);
+      
+   }
+   scanf("%d", &N2);
+   for (int i = 0;i < N2;i++) {
+      p = &root;
+      scanf("%s", ar);
+      printf(" %d", p->data);
+      for (int j = 0;j <= strlen(ar);j++) {
+         switch (ar[j]) {
+         case 'L':
+            p = p->left;
+            printf(" %d", p->data);
+            
+            break;
+         case 'R':
+            p = p->right;
+            printf(" %d", p->data);
+            
+            break;
+         }
+      }
+      ar[100] = '\0';
+   }
+}
