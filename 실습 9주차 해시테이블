@@ -1,0 +1,432 @@
+1.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+typedef struct NODE {
+	int num;
+	struct NODE* next;
+}NODE;
+
+
+NODE* hashTable;
+int M;
+int h(int x);
+void insert(int x);
+int search(int x);
+int delete(int x);
+void print();
+
+
+
+int main() {
+
+	int key;
+	char option;
+
+	scanf("%d", &M);
+
+	hashTable = (NODE*)malloc(sizeof(NODE) * M);
+
+	for (int i = 0; i < M; i++) {
+		(hashTable + i)->num = NULL;
+		(hashTable + i)->next = NULL;
+	}
+
+	while (1) {
+
+		scanf("%c", &option);
+
+		if (option == 'i') {
+			scanf("%d", &key);
+			getchar();
+			insert(key);
+		}
+
+		else if (option == 's') {
+
+			scanf("%d", &key);
+			getchar();
+			printf("%d\n", search(key));
+		}
+
+		else if (option == 'd') {
+
+			scanf("%d", &key);
+			getchar();
+			printf("%d\n", delete(key));
+		}
+
+		else if (option == 'p') {
+
+			print();
+			getchar();
+
+		}
+
+		else if (option == 'e') {
+			break;
+		}
+
+	}
+}
+void insert(int x) {
+
+	int v = h(x);
+	NODE* p = hashTable + v;
+	NODE* newnode = (NODE*)malloc(sizeof(NODE));
+	newnode->num = x;
+	newnode->next = NULL;
+	if (p->next == NULL) {
+		p->next = newnode;
+	}
+
+	else {
+		newnode->next = p->next;
+		p->next = newnode;
+	}
+
+}
+
+
+
+int search(int x) {
+
+	int v = h(x);
+	int cnt = 0;
+	NODE* p = hashTable + v;
+	if (p->next == NULL) {
+		return 0;
+	}
+
+	else {
+		while (1) {
+			p = p->next;
+			cnt++;
+
+			if (p->num == x) {
+				return cnt;
+			}
+
+			if (p->next == NULL) {
+				return 0;
+			}
+		}
+	}
+}
+
+
+
+int delete(int x) {
+
+	int v = h(x);
+	int cnt = 0;
+	NODE* pt = hashTable + v;
+	NODE *p = hashTable + v;
+
+	if (p->next == NULL) {
+		return 0;
+	}
+
+	else {
+		while (1) {
+			p = p->next;
+			cnt++;
+			if (p->num == x) {
+				while (pt->next != p) {
+					pt = pt->next;
+				}
+				pt->next = p->next;
+				free(p);
+				return cnt;
+			}
+			if (p->next == NULL) {
+				return 0;
+			}
+		}
+	}
+}
+
+
+
+void print() {
+
+	NODE* p;
+
+	for (int i = 0; i < M; i++) {
+		p = hashTable + i;
+		if (p->next != NULL) {
+			p = p->next;
+			printf(" %d", p->num);
+
+			while (p->next != NULL) {
+				p = p->next;
+				printf(" %d", p->num);
+			}
+		}
+	}
+	printf("\n");
+}
+
+
+
+int h(int x) {
+	return x % M;
+}
+
+2.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+
+
+int* hashTable;
+int M;
+int h(int x, int M);
+void insert(int x);
+void search(int x);
+int delete(int x);
+void print();
+int getNextBucket(int v, int i);
+
+
+int main() {
+
+	int key;
+	int n;
+	char option;
+
+	scanf("%d", &M);
+
+	hashTable = (int*)malloc(sizeof(int) * M);
+	for (int i = 0; i < M; i++) {
+		*(hashTable + i) = 0;
+	}
+	scanf("%d", &n);
+
+	while (1) {
+
+		scanf("%c", &option);
+
+		if (option == 'i') {
+			scanf("%d", &key);
+			getchar();
+			insert(key);
+		}
+
+		else if (option == 's') {
+
+			scanf("%d", &key);
+			getchar();
+			search(key);
+		}
+
+		
+		else if (option == 'e') {
+			break;
+		}
+
+	}
+}
+
+void insert(int x) {
+
+	int v = h(x, M);
+	int i = 0, b;
+
+	while (i < M) {
+		b = getNextBucket(v, i);
+		if (hashTable[b] == 0) {
+			hashTable[b] = x;
+			for (int j = 0; j < i; j++) {
+				printf("C");
+			}
+
+			printf("%d\n", b);
+			return;
+		}
+
+		else {
+			i++;
+		}	
+	}
+}
+
+
+
+void search(int x) {
+
+	int v = h(x, M);
+	int i = 0, b;
+
+	while (i < M) {
+		b = getNextBucket(v, i);
+		if (hashTable[b] == 0) {
+			printf("-1\n");
+			return;
+		}
+
+		else if (hashTable[b] == x) {
+			printf("%d %d\n", b, hashTable[b]);
+			return;
+		}
+
+		else {
+			i++;
+		}
+	}
+	printf("-1\n");
+}
+
+
+int h(int x, int M){
+	return x % M;
+}
+
+int getNextBucket(int v, int i) {
+
+	return (v + i) % M;
+
+}
+
+3.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+
+
+int* hashTable;
+int M;
+int n;
+int q;
+int h(int x);
+int h2(int x);
+void insert(int x);
+void search(int x);
+int delete(int x);
+void print();
+int getNextBucket(int v, int i, int k);
+
+int main() {
+
+	int key;
+	int n;
+	char option;
+
+	scanf("%d", &M);
+
+	hashTable = (int*)malloc(sizeof(int) * M);
+	for (int i = 0; i < M; i++) {
+		*(hashTable + i) = 0;
+	}
+	scanf("%d", &n);
+	scanf("%d", &q);
+
+	while (1) {
+
+		scanf("%c", &option);
+
+		if (option == 'i') {
+			scanf("%d", &key);
+			getchar();
+			insert(key);
+		}
+
+		else if (option == 's') {
+
+			scanf("%d", &key);
+			getchar();
+			search(key);
+		}
+		
+		else if (option == 'p') {
+			print();
+			getchar();
+		}
+		
+		else if (option == 'e') {
+			print();
+			break;
+		}
+
+	}
+}
+
+void insert(int k) {
+
+	int v = h(k);
+	int i = 0, b;
+
+	while (i < M) {
+		b = getNextBucket(v, i,k);
+		if (hashTable[b] == 0) {
+			hashTable[b] = k;
+			for (int j = 0; j < i; j++) {
+				printf("C");
+			}
+
+			printf("%d\n", b);
+			return;
+		}
+
+		else {
+			i++;
+		}	
+	}
+}
+
+
+
+void search(int k) {
+
+	int v = h(k);
+	int i = 0, b;
+
+	while (i < M) {
+		b = getNextBucket(v, i,k);
+		if (hashTable[b] == 0) {
+			printf("-1\n");
+			return;
+		}
+
+		else if (hashTable[b] == k) {
+			printf("%d %d\n", b, hashTable[b]);
+			return;
+		}
+
+		else {
+			i++;
+		}
+	}
+	printf("-1\n");
+}
+
+void print() {
+
+	for (int i = 0; i < M; i++) {
+		printf(" %d", hashTable[i]);
+	}
+	printf("\n");
+}
+
+
+
+
+int h(int x){
+	return x % M;
+}
+
+
+int h2(int x) {
+	return q - (x % q);
+}
+int getNextBucket(int v, int i, int k) {
+
+	return(v + i * h2(k) % M) % M;
+
+}
