@@ -1,0 +1,300 @@
+1.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+typedef struct NODE {
+	int idx;
+	int weight;
+	struct NODE* next;
+}NODE;
+
+
+typedef struct info {
+	int node;
+	int weight;
+}info;
+
+void push(NODE* root, int idx, int weight);
+void print(NODE* root);
+int check(NODE* root, int x);
+void nodetolist(NODE* root);
+void deleteedge(NODE* x, NODE* y, int xidx, int yidx);
+
+void push(NODE* root, int idx, int weight) {
+	NODE* new = (NODE*)malloc(sizeof(NODE));
+	new->idx = idx;
+	new->weight = weight;
+	new->next = root->next;
+
+	root->next = new;
+}
+
+void print(NODE* root) {
+	NODE* cur = root->next;
+
+	while (cur != NULL) {
+		printf(" %d %d", cur->idx, cur->weight);
+		cur = cur->next;
+	}
+}
+
+void nodetolist(NODE* root) {
+	NODE* cur = root->next;
+
+	int cnt = 0;
+	while (cur != NULL) {
+		cur = cur->next;
+		cnt++;
+	}
+	info* list = (info*)malloc(sizeof(info) * cnt);
+	cur = root->next;
+	for (int i = 0; i < cnt; i++) {
+		list[i].node = cur->idx;
+		list[i].weight = cur->weight;
+		cur = cur->next;
+	}
+	int tmp;
+	for (int i = 0; i < cnt; i++) {
+		for (int j = i; j < cnt; j++) {
+			if (list[i].node > list[j].node) {
+				tmp = list[i].node;
+				list[i].node = list[j].node;
+				list[j].node = tmp;
+
+				tmp = list[i].weight;
+				list[i].weight = list[j].weight;
+				list[j].weight = tmp;
+			}
+		}
+	}
+	for (int i = 0; i < cnt; i++) {
+		printf(" %d %d", list[i].node, list[i].weight);
+	}
+
+
+	printf("\n");
+
+}
+
+void deleteedge(NODE* x, NODE* y, int xidx, int yidx) {
+	NODE* tmp;
+	NODE* lastx;
+	tmp = x->next->next;
+	lastx = x->next;
+
+
+
+	while (lastx != NULL) {
+		if (x->next->idx == yidx) {
+			x->next = x->next->next;
+			free(lastx);
+			break;
+		}
+		if (tmp->idx == yidx) {
+
+			if (tmp->next == NULL) {
+				lastx->next = NULL;
+				free(tmp);
+				break;
+			}
+			else {
+				lastx->next = tmp->next;
+				free(tmp);
+				break;
+			}
+
+		}
+
+		tmp = tmp->next;
+		lastx = lastx->next;
+	}
+	
+	if (xidx == yidx) {
+		return;
+	}
+
+	NODE* temp;
+	NODE* lasty;
+	temp = y->next->next;
+	lasty = y->next;
+
+
+	while (lasty != NULL) {
+		if (y->next->idx == xidx) {
+			y->next = y->next->next;
+			free(lasty);
+			break;
+		}
+		if (temp->idx == xidx) {
+
+			if (temp->next == NULL) {
+				lasty->next = NULL;
+				free(temp);
+				break;
+			}
+			else {
+				lasty->next = temp->next;
+				free(temp);
+				break;
+			}
+
+		}
+
+		temp = temp->next;
+		lasty = lasty->next;
+	}
+
+}
+
+int check(NODE* root, int x) {
+	NODE* tmp = root;
+	while (tmp != NULL) {
+		if (tmp->idx == x) {
+			return 1;
+
+		}
+		tmp = tmp->next;
+	}
+	return 0;
+}
+
+
+
+int main() {
+	int Nver = 6;
+	int Nedge = 8;
+	NODE** arr = (NODE * *)malloc(sizeof(NODE*) * 7);
+	for (int i = 1; i <= 6; i++) {
+		arr[i] = (NODE*)malloc(sizeof(NODE));
+		arr[i]->next = NULL;
+	}
+	int x, y, weight;
+	push(arr[1], 2, 1);
+	push(arr[1], 3, 1);
+	push(arr[1], 4, 1);
+	push(arr[1], 6, 2);
+
+	push(arr[2], 1, 1);
+	push(arr[2], 3, 1);
+
+	push(arr[3], 1, 1);
+	push(arr[3], 2, 1);
+	push(arr[3], 5, 4);
+
+	push(arr[4], 1, 1);
+
+	push(arr[5], 3, 4);
+	push(arr[5], 5, 4);
+	push(arr[5], 6, 3);
+
+	push(arr[6], 1, 2);
+	push(arr[6], 5, 3);
+
+
+	int nodenum;
+	char option;
+	int a, b, newweight;
+	while (1) {
+		scanf("%c", &option);
+
+		if (option == 'a') {
+			scanf("%d", &nodenum);
+			getchar();
+			if (nodenum > 6 || nodenum < 1) {
+				printf("-1\n");
+				continue;
+			}
+			nodetolist(arr[nodenum]);
+		}
+
+		else if (option == 'm') {
+			scanf("%d %d %d", &a, &b, &newweight);
+			if (a > 6 || b > 6 || a < 1 || b > 6) {
+				printf("-1\n");
+				continue;
+			}
+
+
+			if (check(arr[a], b) == 0) {
+				if (a == b) {
+					push(arr[a], a, newweight);
+					continue;
+				}
+				push(arr[a], b, newweight);
+				push(arr[b], a, newweight);
+			}
+			else if (newweight == 0) {
+				deleteedge(arr[a], arr[b], a, b);
+			}
+
+
+		}
+		else if (option == 'q') {
+			break;
+		}
+
+
+
+
+	}
+}
+
+2.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+
+
+
+
+int main() {
+	int arr[6][6] = { 0, 1, 1, 1, 0, 2, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0 , 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4, 3, 2, 0, 0, 0, 3, 0 };
+	int nodenum;
+	char option;
+	int a, b, newweight;
+	while (1) {
+		scanf("%c", &option);
+		
+		if (option == 'a') {
+			scanf("%d", &nodenum);
+			
+			if (nodenum > 6 || nodenum < 1) {
+				printf("-1\n");
+				continue;
+			}
+			for (int j = 0; j < 6; j++) {
+				if (arr[nodenum - 1][j] != 0) {
+					printf(" %d %d", j + 1, arr[nodenum - 1][j]);
+				}
+			}
+			printf("\n");
+		}
+
+		else if (option == 'm') {
+			scanf("%d %d %d", &a, &b, &newweight);
+			
+			if (a > 6 || b > 6 || a < 1 || b < 1) {
+			printf("-1\n");
+			continue;
+			}
+			
+			arr[a - 1][b - 1] = newweight;
+			arr[b - 1][a - 1] = newweight;
+			
+			
+			
+			
+
+		}
+		else if (option == 'q') {
+			break;
+		}
+
+
+
+
+	}
+}
