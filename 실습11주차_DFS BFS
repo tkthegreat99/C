@@ -127,3 +127,46 @@ int main() {
 */
 
 2.
+
+#include <stdio.h>
+#pragma warning(disable: 4996)
+int n, m, v;
+#define MAX 1000
+int visited_BFS[MAX], l[MAX][MAX], que[MAX];
+
+void BFS(int idx)
+{
+	int i;
+	int back = 1;
+	int front = 1;
+	int target;
+	printf("%d\n", idx);
+	que[back++] = idx;
+	visited_BFS[idx] = 1;
+
+	while (front < back) {
+		target = que[front++];
+		for (i = 1; i <= n; i++) {
+			if (l[target][i] && !visited_BFS[i]) {
+				printf("%d\n", i);
+				que[back++] = i;
+				visited_BFS[i] = 1;
+			}
+		}
+	}
+	return;
+}
+
+int main()
+{
+	scanf("%d %d %d", &n, &m, &v);
+
+	int i;
+	for (i = 1; i <= m; i++) {
+		int a, b;
+		scanf("%d %d", &a, &b);
+		l[a][b] = l[b][a] = 1;
+	}
+	BFS(v);
+}
+
