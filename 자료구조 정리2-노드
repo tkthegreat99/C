@@ -1,0 +1,59 @@
+노드(Node)
+   자료구조에서 각 항목을 노드(Node)라 부름
+   컴퓨터 사이언스 분야에서 어떤 구조에서의 각 항목은 노드라고 부르는 경향이 있음
+   자료간의 상호 관계를 노드를 통해 구조화
+
+노드의 구성
+
+   자료 : char(어느 것이 와도 상관 없음_
+   다음 노드 : Node의 포인터
+
+
+
+*/
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+typedef struct node {
+   char data;
+   struct node* next;
+} NODE;
+
+
+int main() {
+   NODE n = { .data = 'A' };
+   printf("n : %c\n", n.data);
+
+   NODE a = { .data = 'A' };
+   NODE b = { .data = 'B' };
+   NODE c = { .data = 'C' };
+
+   a.next = &b;
+   b.next = &c;
+   c.next = NULL; 
+   NODE* p;
+
+   for (p = &a; p != NULL; p = p->next) {
+      printf("%c ", p->data);
+   }
+
+   NODE* head = malloc(sizeof(NODE));
+   head->data = 'A';
+   
+   NODE* curr = head;
+
+   for (int i = 0; i < 5; i++) {
+      curr->next = malloc(sizeof(NODE));
+      curr = curr->next;
+      curr->data = 'B' + i;
+      curr->next = NULL;
+      
+   }
+   
+   for (NODE* i = head; i != NULL; i = i->next) {
+      printf("%c: ", i->data);
+   }
+   
+}
