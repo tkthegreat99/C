@@ -109,7 +109,7 @@ void deleteedge(NODE* x, NODE* y, int xidx, int yidx) {
 		tmp = tmp->next;
 		lastx = lastx->next;
 	}
-	
+
 	if (xidx == yidx) {
 		return;
 	}
@@ -145,6 +145,16 @@ void deleteedge(NODE* x, NODE* y, int xidx, int yidx) {
 		lasty = lasty->next;
 	}
 
+}
+
+void changeweight(NODE* root, int x, int newweight) {
+	NODE* tmp = root;
+	while (tmp != NULL) {
+		if (tmp->idx == x) {
+			tmp->weight = newweight;
+		}
+		tmp = tmp->next;
+	}
 }
 
 int check(NODE* root, int x) {
@@ -214,8 +224,10 @@ int main() {
 				printf("-1\n");
 				continue;
 			}
+			
+			
 
-
+			
 			if (check(arr[a], b) == 0) {
 				if (a == b) {
 					push(arr[a], a, newweight);
@@ -226,6 +238,10 @@ int main() {
 			}
 			else if (newweight == 0) {
 				deleteedge(arr[a], arr[b], a, b);
+			}
+			else if (check(arr[a], b) == 1) {
+				changeweight(arr[a], b, newweight);
+				changeweight(arr[b], a, newweight);
 			}
 
 
