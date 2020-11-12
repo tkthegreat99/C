@@ -1,0 +1,129 @@
+1.
+#pragma warning(disable : 4996)
+#include<stdio.h>
+#include<stdlib.h>
+#define MAX 1000
+#define TRUE 1
+#define FALSE 0
+
+int visited[MAX];
+
+typedef struct GraphNode {
+	int ver;
+	struct GraphNode* next;
+}GraphNode;
+
+typedef struct GraphType {
+	int n;
+	GraphNode* adj_list[MAX];
+}GraphType;
+
+typedef struct Queue {
+	int element[MAX];
+	int front, rear;
+	int size;
+}Queue;
+
+void initqueue(Queue* q) {
+	int i;
+	q->size = 0;
+	q->front = -1;
+	q->rear = -1;
+	for (i = 0; i < MAX; i++) {
+		q->element[i] = 0;
+	}
+}
+
+void enqueue(Queue* q, int idx) {
+	q->element[++(q->rear)] = idx;
+	q->size++;
+}
+void dequeue(Queue* q) {
+	int idx;
+	idx = q->element[++(q->front)];
+	q->size--;
+	return idx;
+}
+void sort(GraphType* g, int v) {
+	GraphNode* w,* k;
+	w = g->adj_list[v];
+	k = g->adj_list[v];
+	int tmp;
+	for (w = g->adj_list[v]; w; w = w->next) {
+		for (k = g->adj_list[v]; k; k = k->next) {
+			if (w != k && w->ver > k->ver) {
+				tmp = w->ver;
+				w->ver = k->ver;
+				k->ver = tmp;
+			}
+		}
+	}
+}
+void dfs(GraphType* g, int v) {
+	GraphNode* w;
+	visited[v] = 1;
+	printf("%d\n", v);
+	sort(g, v);
+	for (w = g->adj_list[v]; w; w = w->next) {
+		if (!visited[w->ver]) {
+			sort(g, w->ver);
+			dfs(g, w->ver);
+		}
+	}
+}
+
+
+void graph_init(GraphType* g) {
+	int v;
+	g->n = 0;
+	for (v = 0; v < MAX; v++) {
+		g->adj_list[v] = NULL;
+	}
+}
+
+void insert_ver(GraphType* g, int v) {
+	if ((g->n) + 1 > MAX) {
+		return;
+	}
+	g->n++;
+}
+
+void insert_edge(GraphType* g, int u, int v) {
+	GraphNode* node;
+	node = (GraphNode*)malloc(sizeof(GraphNode));
+	node->ver = v;
+	node->next = g->adj_list[u];
+	g->adj_list[u] = node;
+}
+
+int main() {
+	int i;
+	GraphType g;
+	graph_init(&g);
+	int n, m, s;
+	scanf("%d %d %d", &n, &m, &s);
+	//n이 정점개수
+	//m이 간선개수
+	//s가 시작정점
+	for (i = 0; i < n; i++) {
+		insert_ver(&g, i);
+	}
+	int a, b;
+	for (i = 0; i < m; i++) {
+		scanf("%d %d", &a, &b);
+		insert_edge(&g, a, b);
+	}
+	dfs(&g, s);
+}
+/*
+5 7 1
+1 2
+1 4
+5 1
+3 5
+4 3
+3 1
+2 3
+*/
+
+2.
