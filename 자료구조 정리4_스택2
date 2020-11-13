@@ -1,0 +1,191 @@
+/*
+
+
+스택(stack)(2)
+   Node
+      자료구조에서 각 데이터의 단위
+      노드의 구성
+      1. 저장된 데이터
+      2. 다음 노드를 가르키는 포인터
+   
+   top
+      
+      처음에는 NULL로 초기화
+      가장 위에 있는 노드의 위치
+      가장 위에 있는 노드의 주소
+         
+   push
+      
+      새로운 노드(new)를 만듦
+      만든 노드에 데이터를 저장
+      기존 stack과 새로운 노드를 연결
+         new->next = top; 
+         pop을 할 때, 과거에 만든 노드 방향으로 이동하는 것이 유리하므로.
+      top이 새로운 노드를 가르키도록 변경
+
+   pop
+      스택에서 맨 위에 있는 데이터를 반환   
+      top이 가르키는 노드의 데이터를 임시 저장 ( 반환용 ) 
+      top의 하나 이전 노드 임시 저장        ( free용 )
+      top이 가르키는 노드 free
+      top이 하나 이전 노드로 변경
+      데이터 반환
+
+   is_empty
+      top이 NULL이라면(아무것도 가르키지 않는다면) 텅 비어 있음.
+*/
+
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+typedef struct node {
+   char data;
+   struct node* next;
+}NODE;
+
+
+
+NODE* getnode(char data) {                     //노드를 만드는 함수 data : 노드에 저장할 데이터
+
+   NODE* new = malloc(sizeof(NODE));
+
+   new->data = data;                        //새로 만든 노드에 데이터 초기화
+
+   new->next = NULL;                        //새로 만든 노드에 next초기화
+
+   return new;
+}
+
+
+int push(NODE** top, char data) {
+   
+   NODE* tmp = getnode(data); //새로운 노드를 만듦
+   
+   tmp->next = *top; //기존 stack 과 연결
+   
+   *top = tmp;  //top 이 새로운 노드를 가르킴
+
+   return 0;
+}
+
+char pop(NODE** top) {
+   
+   char tmpdata = (*top)->data; //top이 가르키는 노드의 데이터를 임시 저장(반환용)
+
+   NODE* tmp = (*top)->next;  //top 의 하나 이전 노드 임시 저장(free용)
+
+   free(*top); // top이 가르키는 노드 free
+
+   (*top) = tmp; // top이 하나 이전 노드로 변경
+
+   return tmpdata; //데이터 반환
+}
+
+
+
+
+int main() {
+   NODE* top;
+   top = NULL;
+   
+   push(&top, 'A'); //주소를 전달해야댐
+   push(&top, 'B'); 
+   push(&top, 'C');
+   push(&top, 'D');
+
+   for (NODE* i = top; i != NULL ; i= i->next ) {
+      printf("%c : ", i->data);
+   }
+   printf("\n");
+   //D:C:B:A
+
+   while (top != NULL) {
+      printf("%c : ", pop(&top));
+   }
+   printf("\n");
+
+   return 0;
+}
+
+/////////////////////
+
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+typedef struct node {
+   char data;
+   struct node* next;
+}NODE;
+
+
+
+NODE* getnode(char data) {                     //노드를 만드는 함수 data : 노드에 저장할 데이터
+
+   NODE* new = malloc(sizeof(NODE));
+
+   new->data = data;                        //새로 만든 노드에 데이터 초기화
+
+   new->next = NULL;                        //새로 만든 노드에 next초기화
+
+   return new;
+}
+
+
+int push(NODE** top, char data) {
+   
+   NODE* tmp = getnode(data); //새로운 노드를 만듦
+   
+   tmp->next = *top; //기존 stack 과 연결
+   
+   *top = tmp;  //top 이 새로운 노드를 가르킴
+
+   return 0;
+}
+
+inline is_empty(NODE** top) {
+   return *top == NULL;
+}
+
+
+char pop(NODE** top) {
+   if (is_empty(top)) return -1;
+
+
+   char tmpdata = (*top)->data; //top이 가르키는 노드의 데이터를 임시 저장(반환용)
+
+   NODE* tmp = (*top)->next;  //top 의 하나 이전 노드 임시 저장(free용)
+
+   free(*top); // top이 가르키는 노드 free
+
+   (*top) = tmp; // top이 하나 이전 노드로 변경
+
+   return tmpdata; //데이터 반환
+}
+
+
+
+int main() {
+   NODE* top;
+   top = NULL;
+   
+   push(&top, 'A'); //주소를 전달해야댐
+   push(&top, 'B'); 
+   push(&top, 'C');
+   push(&top, 'D');
+   
+
+   for (NODE* i = top; i != NULL ; i= i->next ) {
+      printf("%c : ", i->data);
+   }
+   printf("\n");
+   //D:C:B:A
+
+   while (top != NULL) {
+      printf("%c : ", pop(&top));
+   }
+   printf("\n");
+
+   return 0;
+}
