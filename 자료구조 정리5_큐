@@ -1,0 +1,229 @@
+/*
+큐(Queue)
+   줄, 대기열
+   데이터를 순서대로 줄세우는 구조
+
+   맨 앞에 데이터 삽입/ 맨 뒤에서 인출
+   데이터가 삽입의 정순
+   데이터를 넣었다가 빼면, 맨 뒤로 삽입
+
+   FIFO(First In First Out)
+
+   선입선출
+
+
+ADT
+
+    속성
+    front
+      데이터들 중 가장 앞에 있는 데이터의 위치
+    rear
+      데이터들 중 가장 뒤에 있는 데이터의 위치
+
+
+
+   기능
+    enQ
+      stack 에서 push 와 같이, 값을 하나 삽입
+      queue의 가장 뒤에 값을 삽입
+      rear를 가장 뒤의 데이터를 가르키도록 변경
+      반환: 성공시 0 실패시 -1(0이 아닌값)
+    deQ
+      stack 에서 pop과 같이, 값을 하나 인출
+      queue의 가장 앞에서 값을 인출
+      front 가 가장 앞의 데이터를 가르키도록 변경
+      반환: 
+         성공시 인출한 데이터
+         실패시 -1
+
+   is_empty
+      queue가 텅 비어 있는지 확인
+   is_full
+      queue에 데이터가 들어갈 공간이 남아있는지
+      남아있지 않다면 1
+      남아 있다면 0
+
+
+
+*/
+
+/*
+환형 큐
+
+   큐는 enQ/deQ 반복시, front 보다 앞에 있는 공간은 더 이상 사용 불가능해지는 단점이 있음
+      front와 rear 가 같은 방향으로 이동하므로 
+   이를 해결하기 위해, 큐의 끝 지점과 시작 지점을 논리적으로 마치 연결된 것처럼 취급
+   큐가 10개짜리 배열이라면, 9다음은 10이 아닌 0으로 사용
+   
+   구현
+      1. +1 동작 변경(add 함수로 구현)      
+      
+         a + 1 => (a + 1) % MAX                   -> modulo 함수 이용해서 환형의 성질을 이용한거(나머지는 계속 반복되니)
+      
+      2. full 조건 변경
+         queue에서 가득 찬 것과 텅 빈 것을 구분하기 위해
+         front 앞의 공간을 버리도록 함
+         
+         rear가 해당 공간을 가르키고 있다면 full
+
+         따라서 full일때 rear의 다음 공간은 front
+
+         add(rear) == front 라면 full
+*/
+
+#include<stdio.h>
+#define MAX 10
+#define OVERFLOW
+
+unsigned char front;
+unsigned char rear;
+
+
+
+char queue[MAX];
+int enQ(char data);
+char deQ();
+int is_empty();
+int is_full();
+
+#define add(x) ((x+1)% MAX) //매크로 함수-> 함수에 들어가는게 변수가 아니라 글자 그 자체가 들어가게 됨.
+//매크로 함수 -> 전처리기에서 처리    인라인함수 -> 컴파일러에서 처리
+#define test(x) (1+x)
+
+#ifdef OVERFLOW
+#define add(x) (x+1)
+#define MAX 256
+#else
+#define add(x) ((x+1)%MAX)
+#define MAX 10
+#endif
+
+
+
+
+int main() {
+   
+   front = rear = 0;
+
+
+   enQ('A');
+   enQ('B');
+   enQ('C');
+   enQ('D');
+
+   for (int i = front; i < rear; i++) {
+      printf("%c : ", queue[i]);
+   }
+
+   
+   printf("\n");
+
+   for (int i = 0; i < 4; i++) {
+      printf("%c: ", deQ());
+
+   }
+   printf("\n");
+   
+   char dat = '1';
+   
+   
+   while (1) {
+      if (enQ(dat++)) {
+         break;
+      }
+   }
+
+   while (1) {
+      char tmp = deQ();
+      if (tmp < 0) {
+         break;
+      }
+      printf("%c ", tmp);
+   }
+
+   
+
+}
+
+int enQ(char data) {
+   if (is_full()) {
+      return -1;
+   }
+   //데이터 삽입 rear가 가르키는 위치
+   queue[rear] = data;
+   //rear가 가르키는 위치 변경
+   rear = add(rear);
+   //성공시 0 반환
+   return 0;
+}
+
+
+char deQ() {
+   if (is_empty()) {
+      return -1;
+   }
+   
+   //인출할 데이터 임시저장
+   char tmp = queue[front];
+   //front 가 가르키는 위치 변경
+   front = add(front);
+   //성공시 데이터 반환
+   return tmp;
+}
+
+int is_full() {
+
+#ifdef OVERFLOW
+   unsigned char tmp = add(rear);
+   return tmp == front;
+#else
+   return add(rear) == front;
+#endif
+}
+
+
+int is_empty() {
+   return rear == front;
+}
+
+/*
+2020.7.21
+
+큐(queue)
+   
+   Node 
+      자료구조에서 각 데이터의 단위
+      노드의 구성
+      1. 저장된 데이터
+      2. 다음 노드를 가르키는 포인터
+   
+   front
+      가장 앞에 있는 노드의 위치
+         위치 : 노드의 주소(포인터)
+      처음에는 NULL 로 초기화
+
+   rear
+      가장 마지막에 있는 노드의 위치
+         위치: 노드의 주소(포인터)
+      처음에는 NULL 로 초기화
+
+   enQ
+      새로운 노드(new)를 만듦
+      만들어진 노드에 삽입할 데이터 입력
+      기존 Queue와 연결 (rear와 연결)
+      rear가 새로운 노드를 가르키도록 변경
+
+   deQ
+      Queue에서 가장 앞에 있는 데이터를 반환
+      front 가 가르키는 노드의 데이터 임시저장(반환용)
+      front 의 다음 노드 임시 저장(free 용)
+      front 가 가르키는 노드 free
+      front 를 front의 다음 노드로 변경
+      데이터 반환
+
+   is_empty
+      front 가 NULL 이라면 empty
+
+   is_full
+      
+*/
