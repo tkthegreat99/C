@@ -3,8 +3,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #define MAX 1000
-#define TRUE 1
-#define FALSE 0
+
 
 int visited[MAX];
 
@@ -24,33 +23,14 @@ typedef struct Queue {
 	int size;
 }Queue;
 
-void initqueue(Queue* q) {
-	int i;
-	q->size = 0;
-	q->front = -1;
-	q->rear = -1;
-	for (i = 0; i < MAX; i++) {
-		q->element[i] = 0;
-	}
-}
 
-void enqueue(Queue* q, int idx) {
-	q->element[++(q->rear)] = idx;
-	q->size++;
-}
-void dequeue(Queue* q) {
-	int idx;
-	idx = q->element[++(q->front)];
-	q->size--;
-	return idx;
-}
 void sort(GraphType* g, int v) {
-	GraphNode* w,* k;
+	GraphNode* w, * k;
 	w = g->adj_list[v];
 	k = g->adj_list[v];
 	int tmp;
 	for (w = g->adj_list[v]; w; w = w->next) {
-		for (k = g->adj_list[v]; k; k = k->next) {
+		for (k = w; k; k = k->next) {
 			if (w != k && w->ver > k->ver) {
 				tmp = w->ver;
 				w->ver = k->ver;
@@ -63,10 +43,9 @@ void dfs(GraphType* g, int v) {
 	GraphNode* w;
 	visited[v] = 1;
 	printf("%d\n", v);
-	sort(g, v);
+	
 	for (w = g->adj_list[v]; w; w = w->next) {
 		if (!visited[w->ver]) {
-			sort(g, w->ver);
 			dfs(g, w->ver);
 		}
 	}
@@ -94,6 +73,14 @@ void insert_edge(GraphType* g, int u, int v) {
 	node->ver = v;
 	node->next = g->adj_list[u];
 	g->adj_list[u] = node;
+
+	
+	GraphNode* node2;
+	node2 = (GraphNode*)malloc(sizeof(GraphNode));
+	node2->ver = u;
+	node2->next = g->adj_list[v];
+	g->adj_list[v] = node2;
+	
 }
 
 int main() {
@@ -113,18 +100,13 @@ int main() {
 		scanf("%d %d", &a, &b);
 		insert_edge(&g, a, b);
 	}
+	for (i = 0; i < m; i++) {
+		sort(&g, i);
+	}
+
 	dfs(&g, s);
 }
-/*
-5 7 1
-1 2
-1 4
-5 1
-3 5
-4 3
-3 1
-2 3
-*/
+
 
 2.
 
