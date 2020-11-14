@@ -1,0 +1,331 @@
+이진 탐색 트리
+   삭제
+      1. 리프노드를 삭제할 떄
+      2. 자식이 하나인 노드를 삭제할 때
+      3. 자식이 두개인 노드를 삭제할 때
+   
+   리프노드를 삭제할 때
+      삭제할 노드의 부모노드를 찾음
+      부모노드가 삭제할 노드 대신에 NULL을 가르키도록 함
+
+   자식이 하나인 노드를 삭제할 때
+      삭제할 노드의 부모노드를 찾음
+
+      내가 왼쪽 자식이 있다면
+         부모노드가 삭제할 노드 대신에 왼쪽 자식을 가르킴
+      내가 오른쪽 자식이 있다면(아니라면)
+         부모노드가 삭제할 노드 대신에 오른쪽 자식을 가르킴
+
+      자식이 하나인 경우와, 리프노드인 경우는 동일
+         왼쪽 자식이 없을 때, 리프노드라면 오른쪽 자식이 없음
+         부모가 오른쪽 자식을 가르켜도, 아무것도 못가르키는게 동일
+         따라서 같은 조건으로 수행 가능
+
+삭제 알고리즘
+   자식노드가 1개거나 없는 경우
+      NODE* curr : 현재 노드
+      int data   : 삭제할 노드가 가진 값
+
+   다음 노드를 물어보면서, 만약 다음 노드가 삭제할 노드라면 
+      해당 노드 대신에 왼쪽/오른쪽 자식 이라 대답
+
+   다음 노드가 삭제할 노드가 아니라면 
+      다음 노드를 그대로 대답
+
+   1. 현재 노드의 값과 data를 비교해서 
+   2.1 data가 더 작다면 
+      왼쪽 노드로 재귀하며 이동
+      1번 부터 반복
+   2.2 data가 더 크다면
+      오른쪽 노드로 재귀하며 이동
+      1번 부터 반복
+   2.3 data와 같다면
+      1)왼쪽 자식이 없다면 
+         오른쪽 자식을 부모가 curr대신 사용하도록
+      2)아니라 오른쪽 자식이 없다면
+         왼쪽 자식을 부모가 curr대신 사용하도록
+      3)다 아니라면(즉 양쪽 자식이 다 있다면)
+         미구현 이므로 printf로 미구현임을 출력
+
+   자식노드가 2개인 경우
+      1) 해당 노드의 오른쪽 자손 중 가장 작은 값을 탐색
+         i) 오른쪽으로 한 번 전진
+         ii) 왼쪽 자식이 없을 때까지 왼쪽으로 전진
+         iii) 왼쪽 자식이 없는 노드
+         즉, 오른쪽 자손 중 가장 왼쪽에 있는 노드 
+
+      2) 해당 노드의 값을 1)에서 찾은 값으로 변경
+      3) 1)에서 찾은 노드를 삭제(delete로 삭제)
+         시작은? hint root나 curr부터 시작하면
+         2)에서 값을 1) 과 똑같이 바꿨으므로, 현재노드 삭제됨
+
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+   struct node* left;
+   char data;
+   struct node* right;
+};
+typedef struct node NODE;
+
+void preorder(NODE* curr);
+void inorder(NODE* curr);
+void postorder(NODE* curr);
+NODE* getnode(char data);
+NODE* insert(NODE* curr, char data);
+NODE* search(NODE* curr, char data);
+NODE* delete(NODE* curr, char data);
+int main() {
+
+   NODE A = { .data = 'A' };
+   NODE B = { .data = 'B' };
+   NODE C = { 0,'C',0 };
+   NODE D = { .data = 'D' };
+   NODE E = { .data = 'E' };
+   NODE F = { .data = 'F' };
+
+   NODE* root = &A;
+   root->left = &B;
+
+   A.right = &C;
+   A.left->left = &D;
+   B.right = &E;
+
+   root->right->left = &F;
+   preorder(root);
+   printf("\n");
+   inorder(root);
+   printf("\n");
+   postorder(root);
+   printf("\n");
+   //A:B:D:E:C:F:
+
+   printf("----------------------------------\n");
+
+   root = NULL;
+   root = insert(root, 'D');
+   root = insert(root, 'B');
+   root = insert(root, 'A');
+   root = insert(root, 'C');
+   root = insert(root, 'E');
+   root = insert(root, 'F');
+
+   preorder(root);
+   printf("\n");
+   inorder(root);
+   printf("\n");
+   postorder(root);
+   printf("\n");
+
+   printf("----------------------------------\n");
+
+   NODE* tmp = search(root, 'C');
+   if (tmp != NULL) {
+      printf("%c\n", tmp->data);
+   }
+   else {
+      printf("탐색 실패\n");
+   }
+
+   tmp = search(root, 'K');
+
+   if (tmp != NULL) {
+      printf("%c\n", tmp->data);
+   }
+   else {
+      printf("탐색 실패\n");
+   }
+   printf("----------------------------------\n");
+
+   preorder(root);
+   printf("\n");
+   inorder(root);
+   printf("\n");
+   postorder(root);
+   printf("\n");
+   printf("----------------------------------\n");
+
+   root = NULL;
+   root = insert(root, 'J');
+   root = insert(root, 'B');
+   root = insert(root, 'A');
+   root = insert(root, 'D');
+   root = insert(root, 'C');
+   root = insert(root, 'N');
+   root = insert(root, 'L');
+   root = insert(root, 'M');
+   root = insert(root, 'P');
+   root = insert(root, 'O');
+   root = insert(root, 'S');
+   root = insert(root, 'R');
+   root = insert(root, 'Q');
+   root = insert(root, 'T');
+   
+   preorder(root);
+   printf("\n");
+   inorder(root);
+   printf("\n");
+   postorder(root);
+   printf("\n");
+   printf("----------------------------------\n");
+
+   root = delete(root, 'A');
+   inorder(root);
+   printf("\n");
+   root = delete(root, 'D');
+   inorder(root);
+   printf("\n");
+   root = delete(root, 'L');
+   inorder(root);
+   printf("\n");
+   root = delete(root, 'P');
+   inorder(root);
+   printf("\n");
+   root = delete(root, 'J');
+   inorder(root);
+   printf("\n");
+   
+
+
+
+
+
+}
+
+void preorder(NODE* curr) {
+   //0. 탈출조건
+   if (curr == NULL) return;
+   //1. 현재 노드 방문
+   printf("%c:", curr->data);
+   //2. 왼쪽 노드로 이동
+   preorder(curr->left);
+   //3. 오른쪽 노드로 이동
+   preorder(curr->right);
+}
+
+void inorder(NODE* curr) {
+   //0. 탈출조건
+   if (curr == NULL) return;
+   //2. 왼쪽 노드로 이동
+   inorder(curr->left);
+   //1. 현재 노드 방문
+   printf("%c:", curr->data);
+   //3. 오른쪽 노드로 이동
+   inorder(curr->right);
+}
+void postorder(NODE* curr) {
+   //0. 탈출조건
+   if (curr == NULL) return;
+   //2. 왼쪽 노드로 이동
+   postorder(curr->left);
+   //3. 오른쪽 노드로 이동
+   postorder(curr->right);
+   //1. 현재 노드 방문
+   printf("%c:", curr->data);
+}
+NODE* getnode(char data) {
+   NODE* new = malloc(sizeof(NODE));
+   new->left = NULL;
+   new->right = NULL;
+   new->data = data;
+   return new;
+}
+
+NODE* insert(NODE* curr, char data) {
+   //2.3 현재 노드가 비어 있다면
+   if (curr == NULL) {
+      //   이 위치에 삽입
+      
+      NODE* new = getnode(data);
+      return new;
+   }
+   //1. 현재 노드의 데이터와 삽입하려는 값을 비교
+   //2.1 만약 삽입하려는 값이 더 작다면
+   //   왼쪽 노드로 이동(1번부터 시작)
+   if (data < curr->data) {
+
+      curr->left = insert(curr->left, data);
+   }
+
+   //2.2 만약 삽입하려는 값이 더 크다면
+   //   오른쪽 노드로 이동(1번부터 시작)
+   else {
+
+      curr->right = insert(curr->right, data);
+   }
+
+   return curr;
+
+}
+
+NODE* search(NODE* curr, char data) {
+   //0. 현재 노드가 비어있다면, NULL을 반환
+
+   if (curr == NULL) return NULL;
+   //1. 현재 노드의 데이터와 삽입하려는 값을 비교
+
+   //2.1 만약 삽입하려는 값이 더 작다면
+   //왼쪽 노드로 이동(1번 부터 시작)
+   if (data < curr->data) {
+      return search(curr->left, data);
+   }
+   //2.2 만약 삽입하려는 값이 더 크다면
+   //오른쪽 노드로 이동(1번 부터 시작)
+   else if (data > curr->data) {
+      return search(curr->right, data);
+   }
+   //2.3 같다면(노드를 찾았다면)
+   //해당 노드 반환
+   else {
+      return curr;
+   }
+
+}
+
+NODE* delete(NODE* curr, char data) {
+   if (curr == NULL) return NULL;
+
+   //data가 더 작다면
+   //왼쪽 노드로 재귀하며 이동
+   //1번부터 반복
+   if (data < curr->data) {
+      curr->left = delete(curr->left, data);
+      return curr;
+   }
+   //data가 더 크다면
+   //오른쪽 노드로 재귀하며 이동
+   //1번부터 반복
+   else if (data > curr->data) {
+       curr->right = delete(curr->right, data);
+       return curr;
+   }
+   //data와 같다면 
+   //삭제 알고리즘 시작
+   else {
+      //왼쪽 자식이 없다면
+      //오른쪽 자식을 부모가 curr대신 사용
+      if (curr->left == NULL) {
+         
+         return curr->right;
+      }
+      //오른쪽 자식이 없다면
+      //왼쪽 자식을 부모가 curr대신 사용
+      else if (curr->right == NULL) {
+         
+         return curr->left;
+      }
+      else {
+         NODE* min = curr->right;
+         while (min->left != NULL) {
+            min = min->left;
+         }
+          
+         curr->data  = min->data;
+         curr->right = delete(curr->right, min->data);
+         free(min);
+         return curr;
+      }
+   }
+}
