@@ -1,0 +1,158 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include <time.h>
+#include <Windows.h>
+#pragma warning(disable: 4996)
+
+ typedef struct{
+	int ah;
+	int bh;
+}help;
+
+
+help inPlacePartition(int* L, int l, int r, int k);
+void swap(int* L, int i, int j);
+void rQuickSort(int* L, int l, int r, int mode, int lim);
+int findPivot(int* L, int l, int r, int mode);
+int Limits[] = { 1, 100, 500, 1000 };
+void quickSort(int* L, int n, int mode, int lim);
+void insertionSort(int* L, int n);
+void createArray(int* L, int n);
+int findIndexOfMedianOfThree(int a, int b, int c);
+
+
+int main() {
+	LARGE_INTEGER ticksPerSec;
+	LARGE_INTEGER start, end, diff;
+	int mode;
+	int* L;
+
+	int n = 100000;
+	L = (int*)malloc(sizeof(int) * n);
+	createArray(L, n);
+	int* copy_L = (int*)malloc(sizeof(int) * n);
+	int j;
+
+	printf("LIMIT      결정적1      결정적3        무작위1        무작위3\n");
+	for (int i = 0; i < 4; i++) {
+		printf("%d      ", Limits[i]);
+		for (mode = 0; mode < 4; mode++) {
+			for (j = 0; j < n; j++) {
+				copy_L[j] = L[j];
+			}
+			QueryPerformanceFrequency(&ticksPerSec);
+			QueryPerformanceCounter(&start);
+			quickSort(copy_L, n, mode, Limits[i]);
+			QueryPerformanceCounter(&end);
+			diff.QuadPart = end.QuadPart - start.QuadPart;
+			printf("%.12f  ", ((double)diff.QuadPart / (double)ticksPerSec.QuadPart));
+		}
+		printf("\n");
+	}
+
+
+
+}
+
+void quickSort(int* L, int n, int mode, int lim) {
+	rQuickSort(L, 0, n - 1, lim, mode);
+	if (lim > 1) {
+		insertionSort(L, n);
+	}
+}
+
+void insertionSort(int* L, int n) {
+	int i, j;
+	int* p = L;
+	for (int i = 0; i < n; i++) {
+		int key = *(p + i);
+		for (j = i; j > 0; j--) {
+			if (*(p + j - 1) > key) {
+				*(p + j) = *(p + j - 1);
+			}
+			else {
+				break;
+			}
+		}
+		*(p + j) = key;
+	}
+}
+
+
+
+void rQuickSort(int* L, int l, int r, int lim, int mode) {
+	int k, a, b;
+	help A;
+	if (r - l >= lim) {
+		k = findPivot(L, l, r, mode);
+		A = inPlacePartition(L, l, r, k);
+		a = A.ah;
+		b = A.bh;
+		rQuickSort(L, l, a-1, lim, mode);
+		rQuickSort(L, b + 1, r, lim, mode);
+	}
+
+}
+
+void createArray(int *L,int n) {
+	srand(time(NULL));
+	for (int i = 0; i < n; i++) {
+		L[i] = ((((long)rand() << 15) | rand()) % n) + 1;
+	}
+}
+
+int findIndexOfMedianOfThree(int a, int b, int c) {
+	if ((a > b) != (a > c)) return a;
+	else if ((b > a) != (b > c)) return b;
+	else return c;
+}
+
+
+int findPivot(int* L, int l, int r, int mode) {
+	srand(time(NULL));
+	if (r - l == 1) {
+		return l;
+	}
+	if (mode == 0) {
+		return r;
+	}
+	else if (mode == 2) {
+		return rand() % (r-l+1) +l;
+	}
+	else if (mode == 1) {
+		return  findIndexOfMedianOfThree(l, (l + r) / 2, r);
+	}
+	else if (mode == 3) {
+		return findIndexOfMedianOfThree(rand() % (r-l+1) + l, rand() % (r-l + 1) + l, rand() % (r-l + 1) + l);
+	}
+}
+
+help inPlacePartition(int* L, int l, int r, int k) {
+	int p, i, j;
+	p = L[k];
+	swap(L, k, r);
+	i = l;
+	j = r - 1;
+	while (i <= j) {
+		while (i <= j && L[i] <= p)
+			i++;
+		while (j >= i && L[j] >= p)
+			j--;
+		if (i < j) {
+			swap(L, i, j);
+		}
+	}
+	swap(L, i, r);
+	help A;
+	A.ah = j;
+	A.bh = i;
+	return A;
+}
+
+
+void swap(int* L, int i, int j) {
+	int tmp = L[i];
+	L[i] = L[j];
+	L[j] = tmp;
+}
+
