@@ -1,3 +1,4 @@
+1.
 #include<stdio.h>
 #include<stdlib.h>
 #pragma warning(disable: 4996)
@@ -255,3 +256,61 @@ int main() {
 	}
 }
 
+2.
+#include<stdio.h>
+#include<stdlib.h>
+#pragma warning(disable: 4996)
+
+
+
+
+
+
+int main() {
+	int arr[6][6] = { 0, 1, 1, 1, 0, 2, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0 , 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4, 3, 2, 0, 0, 0, 3, 0 };
+	int nodenum;
+	char option;
+	int a, b, newweight;
+	while (1) {
+		scanf("%c", &option);
+		
+		if (option == 'a') {
+			scanf("%d", &nodenum);
+			
+			if (nodenum > 6 || nodenum < 1) {
+				printf("-1\n");
+				continue;
+			}
+			for (int j = 0; j < 6; j++) {
+				if (arr[nodenum - 1][j] != 0) {
+					printf(" %d %d", j + 1, arr[nodenum - 1][j]);
+				}
+			}
+			printf("\n");
+		}
+
+		else if (option == 'm') {
+			scanf("%d %d %d", &a, &b, &newweight);
+			
+			if (a > 6 || b > 6 || a < 1 || b < 1) {
+			printf("-1\n");
+			continue;
+			}
+			
+			arr[a - 1][b - 1] = newweight;
+			arr[b - 1][a - 1] = newweight;
+			
+			
+			
+			
+
+		}
+		else if (option == 'q') {
+			break;
+		}
+
+
+
+
+	}
+}
