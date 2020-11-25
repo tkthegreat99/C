@@ -1,0 +1,132 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include <Windows.h>
+#pragma warning(disable: 4996)
+#define MAX 50
+int H[MAX];
+int A[MAX];
+
+
+int airtelDC(int n, int s, int d) {
+	int mincost = 49;
+	int cost;
+	if (d == s) {
+		return 0;
+	}
+	int k;
+	for (k = s; k <= d - 1; k++) {
+		cost = airtelDC(n, s, k) + H[k] + A[d - k];
+		mincost = min(mincost, cost);
+	}
+	return mincost;
+}
+
+int airtelDP(int n, int s, int de) {
+	int* m = (int*)malloc(sizeof(int)*n);
+	m[s] = 0;
+	int cost;
+	int d;
+	for (d = s+1; d<= de; d++) {
+		m[d] = 9999999;
+		for (int k = s; k <= d - 1; k++) {
+			cost = m[k] + H[k] + A[d - k];
+			m[d] = min(m[d], cost);
+		}
+	}
+	return m[de];
+}
+
+int main() {
+	LARGE_INTEGER ticksPerSec;
+	LARGE_INTEGER start, end, diff;
+
+	A[0] = 0;
+	A[1] = 1;
+	for (int i = 2; i <= MAX - 1; i++) {
+		A[i] = A[i - 1] + A[i - 1] % 5 + 3;
+	}
+	H[0] = 0;
+	H[1] = 1;
+	for (int i = 2; i <= MAX - 1; i++) {
+		H[i] = (H[i - 1] + i) % 9 + 1;
+	}
+
+	int n = 6;
+	
+	int s = 0;
+	int d = 4;
+
+	
+	int minCost;
+	printf("n          s            d         mincost      version      cputime\n");
+	
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDC(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDP(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+	
+	s = 1;
+	d = 5;
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDC(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDP(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	s = 2;
+	d = 4;
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDC(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDP(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+
+	n = MAX;
+	s = 1;
+	d = n - 2;
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDC(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	QueryPerformanceFrequency(&ticksPerSec);
+	QueryPerformanceCounter(&start);
+	minCost = airtelDP(n, s, d);
+	QueryPerformanceCounter(&end);
+	diff.QuadPart = end.QuadPart - start.QuadPart;
+	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
+
+	return 0;
+}
