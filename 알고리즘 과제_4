@@ -2,40 +2,59 @@
 #include<stdlib.h>
 #include<string.h>
 #include <Windows.h>
+#include<time.h>
+
 #pragma warning(disable: 4996)
 #define MAX 50
 int H[MAX];
 int A[MAX];
+int smaller(int x, int y);
+int airtelDC(int n, int s, int d);
+int rairtelDC(int n, int s, int d);
+int airtelDP(int n, int s, int de);
+
+int smaller(int x, int y) {
+	if (x < y) {
+		return x;
+	}
+	else return y;
+}
 
 
 int airtelDC(int n, int s, int d) {
-	int mincost = 49;
-	int cost;
+	return rairtelDC(n, s, d);
+}
+
+int rairtelDC(int n, int s, int d) {
+	int mincost = 99999;
+	int cost=0;
 	if (d == s) {
 		return 0;
 	}
 	int k;
 	for (k = s; k <= d - 1; k++) {
-		cost = airtelDC(n, s, k) + H[k] + A[d - k];
-		mincost = min(mincost, cost);
+		cost = rairtelDC(n, s, k) + H[k] + A[d - k];
+		mincost = smaller(mincost, cost);
 	}
 	return mincost;
 }
 
 int airtelDP(int n, int s, int de) {
-	int* m = (int*)malloc(sizeof(int)*n);
+	int* m = (int*)malloc(sizeof(int) * n);
 	m[s] = 0;
 	int cost;
 	int d;
-	for (d = s+1; d<= de; d++) {
+	for (d = s + 1; d <= de; d++) {
 		m[d] = 9999999;
 		for (int k = s; k <= d - 1; k++) {
 			cost = m[k] + H[k] + A[d - k];
-			m[d] = min(m[d], cost);
+			m[d] = smaller(m[d], cost);
 		}
 	}
 	return m[de];
 }
+
+//책 의사코드에서 시작점, 끝점만 바꾸어 주면 된다.
 
 int main() {
 	LARGE_INTEGER ticksPerSec;
@@ -47,47 +66,48 @@ int main() {
 		A[i] = A[i - 1] + A[i - 1] % 5 + 3;
 	}
 	H[0] = 0;
-	H[1] = 1;
+	H[1] = 5;
 	for (int i = 2; i <= MAX - 1; i++) {
 		H[i] = (H[i - 1] + i) % 9 + 1;
 	}
 
 	int n = 6;
-	
+
 	int s = 0;
 	int d = 4;
 
-	
+
 	int minCost;
 	printf("n          s            d         mincost      version      cputime\n");
-	
+
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDC(n, s, d);
+	minCost = airtelDC(n, s, d) + H[d];
+	//마지막 호텔비 추가.
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDP(n, s, d);
+	minCost = airtelDP(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
-	
-	s = 1;
+
+	s = 2;
 	d = 5;
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDC(n, s, d);
+	minCost = airtelDC(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDP(n, s, d);
+	minCost = airtelDP(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
@@ -97,33 +117,33 @@ int main() {
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDC(n, s, d);
+	minCost = airtelDC(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDP(n, s, d);
+	minCost = airtelDP(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
 
 
-	n = MAX;
+	n = MAX/2;
 	s = 1;
 	d = n - 2;
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDC(n, s, d);
+	minCost = airtelDC(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DC           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
 
 	QueryPerformanceFrequency(&ticksPerSec);
 	QueryPerformanceCounter(&start);
-	minCost = airtelDP(n, s, d);
+	minCost = airtelDP(n, s, d) + H[d];
 	QueryPerformanceCounter(&end);
 	diff.QuadPart = end.QuadPart - start.QuadPart;
 	printf("%d           %d           %d         %d        DP           %.12f sec\n", n, s, d, minCost, (double)diff.QuadPart / (double)ticksPerSec.QuadPart);
