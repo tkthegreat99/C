@@ -1,0 +1,196 @@
+#pragma warning(disable : 4996)
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+
+typedef struct basicNode {
+	int data;
+	struct basicNode* next;
+}basicNode;
+
+typedef struct Node {
+	char name;
+	int data;
+	int inDegree;
+	basicNode* in;
+	basicNode* out;
+	basicNode* next;
+}Node;
+
+typedef struct Edge {
+	char from;
+	char to;
+}Edge;
+
+basicNode* getNode() {
+	basicNode* new;
+	new = (basicNode*)malloc(sizeof(basicNode));
+	new->next = NULL;
+	return new;
+}
+
+int m, n;
+int* Queue;
+int front, rear;
+basicNode* tmpnode, * NPtr;
+Node* ver;
+Edge* In, * Out, *edge;
+void enqueue(int data);
+int dequeue();
+int* topOrder;
+int* in;
+int isFull();
+void buildGraph();
+void topologicalSort();
+int isEmpty();
+void insertVertex(char vName, int i);
+int index(char vName);
+void insertDirectedEdge(char uName, char wName, int i);
+void addFirst(basicNode* H, int i);
+
+
+int main() {
+	
+	buildGraph();
+	topologicalSort();
+
+	if (!topOrder[0]) {
+		printf("%d", 0);
+	}
+	else {
+		for (int i = 1; i <= n; i++) {
+			printf("%c ", ver[topOrder[i]].name);
+		}
+	}
+}
+
+void enqueue(int data) {
+	rear = (rear + 1) % n;
+	Queue[rear] = data;
+}
+int dequeue() {
+	int data;
+	data = Queue[front];
+	Queue[front] = 0;
+	front = (front + 1) % n;
+	return data;
+}
+
+void buildGraph() {
+
+	char uName;
+	char wName;
+	char vName;
+
+	ver = (Node*)malloc(sizeof(Node) * 99);
+	edge = (Edge*)malloc(sizeof(Edge) * 999);
+
+	scanf("%d", &n);
+	getchar();
+	topOrder = (int*)malloc(sizeof(int) * (n + 1));
+	
+	for (int i = 0; i < n; i++) {
+		scanf("%c", &vName);
+		insertVertex(vName, i);
+		getchar();
+	}
+	scanf("%d", &m);
+	getchar();
+
+	for (int i = 0; i <= m - 1; i++) {
+		scanf("%c %c", &uName, &wName);
+		insertDirectedEdge(uName, wName, i);
+		getchar();
+	}
+	return;
+}
+void insertVertex(char vName, int i) {
+	ver[i].name = vName;
+	ver[i].out = getNode();
+	ver[i].in = getNode();
+	ver[i].inDegree = 0;
+	return;
+}
+void insertDirectedEdge(char uName, char wName, int i) {
+	int u = index(uName);
+	int w = index(wName);
+	edge[i].from = u;
+	edge[i].to = w;
+	addFirst(ver[u].out, i);
+	addFirst(ver[w].in, i);
+	ver[w].inDegree++;
+	return;
+}
+int index(char vName) {
+	for (int i = 0; i <= n - 1; i++) {
+		if (ver[i].name == vName) {
+			return i;
+		}
+	}
+}
+void addFirst(basicNode* H, int i) {
+	tmpnode = getNode();
+	tmpnode->data = i;
+	tmpnode->next = H->next;
+	H->next = tmpnode;
+	return;
+}
+void topologicalSort() {
+	front = 1;
+	rear = 0;
+	Queue = (int*)malloc(sizeof(int) * (n + 1));
+	
+	int u, e, w;
+	in = (int*)malloc(sizeof(int) * (n + 1));
+	for (int i = 0; i <= n - 1; i++) {
+		in[i] = ver[i].inDegree;
+		if (in[i] == 0) {
+			enqueue(i);			
+		}
+	}
+	int t = 1;
+	
+	while (!isEmpty()) {
+		u = dequeue();
+		topOrder[t] = u;
+		t++;
+
+		NPtr = ver[u].out;
+		NPtr = NPtr->next;
+
+		while (NPtr != NULL) {
+			
+			e = NPtr->data;
+			w = edge[e].to;
+			
+			in[w]= in[w] - 1;
+			if (!in[w]) {
+				enqueue(w);
+			}
+			NPtr = NPtr->next;
+		}
+	}
+	if (t <= n) {
+		topOrder[0] = 0;
+	}
+	else {
+		topOrder[0] = 1;
+	}
+	return;
+}
+int isFull() {
+	if ((rear + 2) % n == front) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+int isEmpty() {
+	if ((rear + 1) % n == front) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
