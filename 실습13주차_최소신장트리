@@ -1,0 +1,499 @@
+1.
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#pragma warning(disable : 4996)
+
+typedef struct basicNode {
+	int element;
+	struct basicNode* next;
+}basicNode;
+
+
+
+typedef struct Node {
+	int name;
+	int element;
+	int parent;
+	int data;
+	basicNode* Edges;
+}Node;
+basicNode* New;
+
+typedef struct Edge {
+	int to;
+	int from;
+	int weight;
+}Edge;
+
+Edge * edge;
+
+typedef struct Queue {
+	int element;
+	int info;
+}Queue;
+Queue* Q;
+
+
+basicNode* getNode() {
+	basicNode* new;
+	new = (basicNode*)malloc(sizeof(basicNode));
+	new->next = NULL;
+	return new;
+}
+
+
+
+Node* ptr, * tmp;
+void initializeGraph();
+void buildGraph();
+void addFirst(basicNode* H, int i);
+int n;
+int m;
+int isEmpty(int index);
+void insertVertex(int vName, int i);
+void connectEdge(int uName, int wName, int Weight, int i);
+void buildHeap(int Num);
+void downHeap(int v, int Num);
+int isBelong(int z);
+int isInternal(int v, int num);
+int isExternal(int v, int num);
+void replaceKey(int e, int k);
+int removemin(int Num);
+void incidentEdges(int u);
+int backward(int u, int e);
+Node* vertice;
+int up;
+
+
+int main() {
+	int i;
+	buildGraph();
+	int min = 0;
+	i = 1;
+	while (i <= n) {
+		vertice[i].data = 9999999;
+		vertice[i].parent = 9999999;
+		i++;
+	}
+
+	Q = (Queue*)malloc(sizeof(Queue) * (n + 1));
+	
+	vertice[1].data = 0;
+	i = 1;
+	while (i <= n) {
+		Q[i].element = i;
+		Q[i].info = vertice[i].data;
+		i += 1;
+	}
+	
+	buildHeap(n);
+	int u;
+	int tot = 0;
+	while (!isEmpty(up)) {
+		u = removemin(up);
+		up-=1;
+		printf(" %d", u);
+		
+		tot += vertice[u].data;
+		incidentEdges(u);
+		
+	}
+	printf("\n");
+	printf("%d", tot);
+}
+
+void buildGraph() {
+	int weight;
+	scanf("%d %d", &n, &m);
+	up = n;
+	getchar();
+	initializeGraph();
+	int uName;
+	int wName;
+	int vName;
+	int i = 1;
+	while (i <= n) {
+		vName = i + 1;
+		insertVertex(vName, i);
+		i++;
+	}
+	i = 1;
+	while (i <= m) {
+		scanf("%d %d %d", &uName, &wName, &weight);
+		getchar();
+		connectEdge(uName, wName, weight, i);
+		i++;
+	}
+	return;
+}
+void insertVertex(int vName, int i) {
+	vertice[i].name = vName;
+	vertice[i].Edges = getNode();
+}
+void connectEdge(int uName, int wName, int Weight, int i) {
+	int u = uName;
+	int w = wName;
+	edge[i].to = u;
+	edge[i].from = w;
+	edge[i].weight = Weight;
+	addFirst(vertice[u].Edges, i);
+	addFirst(vertice[w].Edges, i);
+}
+
+void initializeGraph() {
+	vertice = (Node*)malloc(sizeof(Node) * (1 + n));
+	edge = (Edge*)malloc(sizeof(Edge) * (1 + m));
+}
+
+void addFirst(basicNode * H, int i) {
+	New = getNode();
+	New->element = i;
+	New->next = H->next;
+	H->next = New;
+}
+void replaceKey(int z, int k) {
+	vertice[z].data = k;
+	int i = 1;
+	while(i <= up) {
+		if (Q[i].element == z) {
+			Q[i].info = vertice[z].data;
+			break;
+		}
+		i++;
+	}
+	buildHeap(up);
+	
+}
+void buildHeap(int N) {
+	for (int i = N / 2; i >= 1; i--) {
+		downHeap(i, N);
+	}
+}
+void downHeap(int i, int N) {
+	int left = i * 2;
+	int right = i * 2 + 1;
+
+	if (isExternal(left, N) && isExternal(right, N)) {
+		return;
+	}
+	int small = left;
+	if (isInternal(right, N)) {
+		if (Q[right].info < Q[left].info) {
+			small = right;
+		}
+	}
+	if (Q[i].info <= Q[small].info) {
+		return;
+	}
+	
+	Queue tmp;
+	tmp = Q[i];
+	Q[i] = Q[small];
+	Q[small] = tmp;
+	downHeap(small, N);
+}
+int isExternal(int v, int num) {
+	if (num < v) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+int isInternal(int v, int num) {
+	if (num >= v) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+int removemin(int num) {
+	int k = Q[1].element;
+	Q[1] = Q[num];
+	downHeap(1, num);
+	return k;
+}
+int isEmpty(int index) {
+	if (!index) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+void incidentEdges(int u) {
+	basicNode* temp;
+	temp = vertice[u].Edges;
+	temp = temp->next;
+	int e = 0, flag = 0;
+	int z;
+	while (temp != NULL) {
+		e = temp->element;
+		z = backward(u, e);
+		
+		if (isBelong(z) && vertice[z].data > edge[e].weight) {
+			vertice[z].data = edge[e].weight;
+			vertice[z].parent = e;
+			replaceKey(z, edge[e].weight);
+		}
+		temp = temp->next;
+	}
+}
+int backward(int u, int e) {
+	if (edge[e].to == u) {
+		return edge[e].from;
+	}
+	else if (edge[e].from == u) {
+		return edge[e].to;
+	}
+}
+int isBelong(int z) {
+	int i = 1;
+	while (i <= up) {
+		if (z == Q[i].element) {
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
+
+
+2.
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#pragma warning(disable : 4996)
+typedef struct Edge {
+	int to;
+	int from;
+	int weight;
+}Edge;
+Edge* edge;
+
+typedef struct Node {
+	int name;
+	struct Node* next;
+	struct Node* set;
+}Node;
+Node* ptr, *ptr2,* vertice;
+typedef struct Group {
+	struct Node* Head;
+	struct Node* Rear;
+	int size;
+}Group;
+typedef struct Queue {
+	int element;
+	int info;
+}Queue;
+Queue* Q;
+Node* node;
+Group* group, T;
+
+
+void buildGraph();
+void insertVertex(int vName, int i);
+void connectEdge(int uName, int wName, int weight, int i);
+int backward(int u, int e);
+int isPart(int z);
+Group* search(int v);
+int isEmpty(int idx);
+void buildHeap(int N);
+void downHeap(int i, int N);
+int removemin(int N);
+int up;
+int isExternal(int v, int lim);
+int isInternal(int v, int lim);
+int m2, n, m;
+
+int main() {
+	buildGraph();
+	int i = 1;
+	Q = (Queue*)malloc(sizeof(Queue) * (1 + m));
+	while (i <= m) {
+		Q[i].element = i;
+		Q[i].info = edge[i].weight;		
+		i++;
+	}
+		
+	buildHeap(m);
+	T.size = 0;
+	int idx = 0;
+	int u, v;
+	int tot = 0;
+	m2 = m;
+
+	Group* H1 = NULL;
+	Group *H2 = NULL;
+	while (T.size < n - 1) {
+		idx = removemin(m2);
+		
+		u = edge[idx].to;
+		v = edge[idx].from;
+		
+		H1 = search(u);
+		H2 = search(v);
+		ptr2 = H2->Head;
+		
+		if (H1->Head != H2->Head) {
+			T.size+=1;
+			printf(" %d", edge[idx].weight);
+			tot += edge[idx].weight;
+			H2->Rear->next = H1->Head;
+			H2->Rear = H1->Rear;
+			H1->Rear = NULL;
+			H1->Head = NULL;
+		}
+		m2-=1;
+	}
+	printf("\n%d", tot);
+}
+
+void buildGraph() {
+	int weight;
+	scanf("%d %d", &n, &m);
+	getchar();
+	up = n;
+	group = (Group*)malloc(sizeof(Group) * (n + 1));
+	vertice = (Node*)malloc(sizeof(Node) * (n + 1));
+	edge = (Edge*)malloc(sizeof(Edge) * (1 + m));
+	int uName;
+	int wName;
+	int vName;
+	int i=1;
+
+	while (i <= n) {
+		vName = i;
+		insertVertex(vName, i);
+		i++;
+	}
+	
+	i = 1;
+
+	while (i <= m) {
+		scanf("%d %d %d", &uName, &wName, &weight);
+		getchar();
+		connectEdge(uName, wName, weight, i);
+		i++;
+	}
+
+	i = 1;
+
+	while (i <= n) {
+		vertice[i].next = NULL;
+
+		group[i].Head = &vertice[i];
+		group[i].Rear = &vertice[i];
+		group[i].size = 0;		
+		i++;
+	}
+	
+}
+
+
+Group* search(int v) {
+	int i = 1;
+	ptr2 = NULL;
+
+	while (i <= n) {
+		ptr2 = group[i].Head;
+
+		while (ptr2 != NULL) {
+			if (ptr2->name == v) {
+				return &group[i];
+			}
+			ptr2 = ptr2->next;
+		}
+		i += 1;
+	}
+}
+
+void insertVertex(int vName, int i) {
+	vertice[i].name = vName;
+}
+void connectEdge(int uName, int wName, int weight, int i) {
+	int u = uName;
+	int w = wName;
+	edge[i].to = u;
+	edge[i].from = w;
+	edge[i].weight = weight;
+}
+void buildHeap(int N) {
+	for (int i = N / 2; i >= 1; i--) {
+		downHeap(i, N);
+	}
+}
+void downHeap(int i, int N) {
+	int l = i * 2;
+	int r = i * 2 + 1;
+
+	if (isExternal(l, N) && isExternal(r, N)) {
+		return;
+	}
+	int small = l;
+	if (isInternal(r, N)) {
+		if (Q[l].info > Q[r].info) {
+			small = r;
+		}
+	}
+	if (Q[i].info <= Q[small].info) {
+		return;
+	}
+	Queue tmp;
+	tmp = Q[i];
+	Q[i] = Q[small];
+	Q[small] = tmp;
+	downHeap(small, N);
+}
+
+int removemin(int lim) {
+	int tar;
+	tar = Q[1].element;
+	Q[1] = Q[lim];
+	downHeap(1, lim);
+	return tar;
+}
+int isEmpty(int idx) {
+	if (!idx) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+int backward(int u, int e) {
+	if (edge[e].to == u) {
+		return edge[e].from;
+	}
+	else if (edge[e].from == u) {
+		return edge[e].to;
+	}
+}
+int isPart(int z) {
+	int i = 1;
+	while (i <= up) {
+		if (z == Q[i].element) {
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
+int isExternal(int v, int lim) {
+	if (lim < v) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+int isInternal(int v, int lim) {
+	if (lim >= v) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
